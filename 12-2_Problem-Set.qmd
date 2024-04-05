@@ -1,9 +1,9 @@
 ---
 title: "WW-2 Problem Set"
-author: 
-date: '`r Sys.Date()`'
-output: pdf_document
+author: "Clay Wright"
+format: pdf
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -16,4 +16,3 @@ Complete the following, replacing the *italic* text. Knit this document to a pdf
 Question
  
 *answer here*
-

@@ -1,0 +1,183 @@
+---
+title: "WW-0_intro"
+author: "Clay Wright"
+format: html
+---
+
+This week our goals are to be able to:
+
+```{r setup}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(dataRetrieval)
+library(ggplot2)
+library(pracma)
+library(readxl)
+library(dplyr)
+library(cowplot)
+library(lubridate)
+```
+Paper source:
+Rosburg et al. (2016). The effect of flow data resolution on sediment yield estimation and channel design. https://doi.org/10.1016/j.jhydrol.2016.04.040
+
+#Objective: calculate total annual sediment [mass/year] and water [volume/year] for a given year for a specific station
+
+#Approach: 
+Here, you'll apply numerical integration using the `trapz` function in `pracma`. You'll want to set up a data frame of x and y, with x = day of year ranging between 1-365; y is the sediment load based on the equation and given streamflow).
+
+#Workflow
+
+1. Read in sediment-rating curve (data here in the file 1-s2.0-S0022169416302311-mmc2.xlsx)
+2. Read in streamflow data using `readNWISdv` from `dataRetrieval` package
+2. Calculate average daily sediment yield [kg/s]
+3. For a given year, integrate under the daily sediment yield and daily streamflow using `trapz` function within the `pracma` package. 
+
+# Apply case scenario: 
+Compare the 2011 and 2012 year for water and sediment in the Lower Mississippi River (station id 07374000). Create 1 plot (with day of year on x-axis) of streamflow (2 lines, one for 2011 and one for 2012); Create 1 plot (with day of year on x-axis) of sediment flux (2 lines, one for 2011 and one for 2012). Calculate total annual sediment mass and water volume and compare the values between 2011 and 2012. Is the ratio of sediment mass for each year the same as the ratio of water volume (e.g. mass sed 2012/mass sed 2011)? In other words, was the streamflow carrying the same amount of sediment in 2011 and 2012? Create clear graphics and write up your comparison in a paragraph. 
+
+
+### Background on sediment rating curve table and the coefficients $a$ and $b$:
+From Rosburg et al.: Relationships between water discharge and sediment load often can be expressed as a simple power function: 
+$$Q_s = aQ^b$$
+where $Q_s$ is the sediment discharge rate (kg/s), $Q$ is the concurrently-measured water discharge rate (m^3^/s), and $a$ and $b$ are best fit regression parameters (Asselman, 2000, Syvitski et al., 2000). This function is referred to as a sediment rating curve. In this relationship, it has been suggested that the exponent $b$ is related to the transport capacity in excess of sediment supply within a river channel, while the coefficient $a$ is related to absolute sediment supply (Barry et al., 2004). The exponent, $b$, tends to increase with the size of bed material in coarse bed rivers (Emmett and Wolman, 2001).
+
+## Read in sediment rating curve table
+```{r}
+ds <- readxl::read_excel("1-s2.0-S0022169416302311-mmc2.xlsx", 
+     col_types = c("text", "text", "numeric", 
+         "numeric", "numeric", "numeric", 
+         "numeric", "numeric", "text", 
+         "text", "numeric", "numeric", 
+         "text"), skip = 1)
+```
+# Station Identification and Data Retreival
+
+```{r}
+site_id <- '07374000'
+startDate <- '2000-01-01'
+endDate <- '2020-12-30'
+pCode <- '00060'
+rawDailyQ <- readNWISdv(site_id,pCode, startDate, endDate)
+```
+
+## Filter sediment table for station of interest
+```{r}
+dsm <- ds[which(ds$`Site Number`==site_id),]
+```
+
+## Calculate Daily sediment mass flux
+```{r}
+#cfs
+Q_cms <- rawDailyQ$X_00060_00003/3.28084^3 # conversion to cms
+a <- dsm$a # set a coefficient from filtered rating curve table
+b <- dsm$b # set b coefficient from filtered rating curve table
+Qs_kgs <- a*Q_cms^b
+Qs_kgd <- Qs_kgs*60*60*24 # sediment load per day in kg/day
+d <- data.frame(Q_cms,Qs_kgd,rawDailyQ$Date)
+colnames(d)[3] <- "Date"
+p <- ggplot(d, aes(Q_cms, Qs_kgd)) + 
+  geom_line() + 
+  theme_cowplot() +
+  xlab('Streamflow [cms]') +
+  ylab('Sediment load [kg per day]')
+p
+```
+
+
+```{r}
+p2 <- ggplot(rawDailyQ, aes(Date,X_00060_00003)) + 
+  geom_point() + 
+  theme_cowplot() +
+  xlab('Date') +
+  ylab('Streamflow [cfs]')
+p2
+```
+
+```{r}
+p3 <- ggplot(d, aes(Date,Qs_kgd)) + 
+  geom_point() + 
+  theme_cowplot() +
+  xlab('Date') +
+  ylab('Sediment Flux [kg/d]')
+p3
+```
+
+# Compare 2011 and 2012 in case study
+
+```{r}
+
+d1 <- filter(d, Date > "2010-12-31" & Date < "2012-01-01")
+d2011 <- trapz(d1$Qs_kgd)*.001 # include conversion seconds to days, kg to metric tons
+q2011 <- trapz(d1$Q_cms*86400)/1e9 # include conversion seconds to days, scale by 1e9, so units are billion cubic meters 
+q2011
+d2011
+```
+
+
+```{r}
+d2 <- filter(d, Date > "2011-12-31" & Date < "2013-01-01")
+d2012 <- trapz(d2$Qs_kgd)*.001 # include conversion seconds to days, kg to metric tons
+q2012 <- trapz(d2$Q_cms*86400)/1e9 # include conversion seconds to days, scale by 1e9, so units are billion cubic meters 
+q2012
+d2012
+```
+
+```{r}
+
+q2012/q2011 # ratio of total water volume per year
+d2012/d2011 # ratio of total sediment mass per year
+```
+```{r}
+p2 <- ggplot() +
+  geom_line(data=d1, aes(x=yday(Date),y=Q_cms), color="blue") +
+  geom_line(data=d2, aes(x=yday(Date),y=Q_cms), color="red") +
+    theme_cowplot() +
+  xlab('Day of year') +
+  ylab('Streamflow [cfs]')
+p2
+```
+```{r}
+p3 <- ggplot() +
+  geom_line(data=d1, aes(x=yday(Date),y=Qs_kgd), color="blue") +
+  geom_line(data=d2, aes(x=yday(Date),y=Qs_kgd), color="red") +
+    #theme_cowplot() +
+  xlab('Day of year') +
+  ylab('Sediment load [kgd]') + theme(legend.position = "right")
+p3
+
+```
+
+```{r summarize_year}
+
+d_f <- d %>% 
+  #create a year column
+  mutate(yr=year(Date)) %>% 
+  # group by year and then integrate to find total volume or mass for each year
+  group_by(yr) %>% mutate(Q_int = trapz(Q_cms)*8640/1e9) %>% 
+  mutate(Qs_int = trapz(Qs_kgd)*.001)  %>% 
+  summarize_all(max)
+d_f
+d_f$rq <- d_f$Qs_int/d_f$Q_int/1000
+d_f$m <- d_f$Qs_int/d_f$Q_cms
+d_f
+```
+
+
+Let's build one single dataset from the 2011 and 2012 data above so that we can make a nice legend on our plot.
+
+```{r}
+data_2011_2012 <- 
+  bind_rows(d1, d2) %>%
+  mutate(Year = year(Date) %>% as.factor(),
+         DOTY = yday(Date))
+
+
+ggplot(data = data_2011_2012, 
+       mapping = aes(x = DOTY, y = Qs_kgd, color = Year)) +
+  geom_line() +
+  theme_cowplot() +
+  xlab('Day of year') +
+  ylab('Sediment load [kgd]') 
+
+```
+
