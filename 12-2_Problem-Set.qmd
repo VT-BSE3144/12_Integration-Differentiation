@@ -9,10 +9,30 @@ format: pdf
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Complete the following, replacing the *italic* text. Knit this document to a pdf, **double check the pdf document for errors**, and submit this to this week's Problem Set assignment on Canvas. 
+#General instructions
+Complete the following. Knit this document to a pdf, **double check the pdf document for errors**, and submit this to this week's Problem Set assignment on Canvas. 
 
-## Problem 1 - Title
+#Paper source:
+Rosburg et al. (2016). The effect of flow data resolution on sediment yield estimation and channel design. https://doi.org/10.1016/j.jhydrol.2016.04.040
 
-Question
- 
-*answer here*
+#Use same workflow from example 
+Data set from journal article listed above (also used in example).
+Load in data from [dataset-1-s2.0-S0022169416302311-mmc2.xlsx]file & complete the following steps.
+
+# Objective: 
+Calculate total annual sediment [mass/year] and water [volume/year] for a given year for a specific station
+
+#Instructions
+Repeat the case study workflow from example for the Rappahannock River near Fredericksburg, VA (station ID: 01668000), but this time, instead of just comparing 2 years, find the year with the greatest average sediment flux (`Qs_kgd`) and lowest average sediment flux, for the same range from 2000 through 2020. Create clear graphics and write up your comparison in a paragraph. 
+
+## Part 1: Streamflow
+Create 1 plot (with day of year on x-axis) of streamflow (2 lines, one for highest mean Qs_kgd and one for lowest mean Qs_kgd); 
+
+## Part 2: Sediment Flux
+Create 1 plot (with day of year on x-axis) of sediment flux (2 lines, one for for highest mean Qs_kgd and one for lowest mean Qs_kgd).
+
+## Part 3: Integration
+Calculate total annual sediment mass and water volume and compare the values between for highest mean Qs_kgd and one for lowest mean Qs_kgd. Is the ratio of sediment mass for each year the same as the ratio of water volume ? In other words, was the streamflow carrying the same amount of sediment in 2011 and 2012? 
+
+## Part 4: Integration across months
+Calculate the monthly sediment mass and water volume and plot these for the two years. Do they highest and lowest sediment and water volume occur in the same month for each of these years?
