@@ -1,12 +1,16 @@
 ---
-title: "WW-12 Examples"
+title: "12-1 Differentiation and Integration Examples"
 author: "Clay Wright"
-format: html
+format:
+  html:
+    df_print: paged
+    toc: true
+    toc-depth: 6
 ---
 
 Week 12 - Differentiation & Integration
 
-#DIFFERENTIATION
+# Differentiation
 
 ```{r setup}
 library(readr)
@@ -15,21 +19,17 @@ library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Numerical differentiation
-
 One place were we often use numerical differentiation to solve problems is in predicting and comparing cell growth rates. Cell growth can be defined by the differential equation:
 $$\frac{dX}{dt} = \mu X$$
-where X is the concentration of cells and $\mu$ is the specific growth rate, which in the simplest case is just a rate constant. So the rate of change of the concentration of cells is proportional to the concentration of cells. In the simplest case, where  we can just solve this by integration by parts (IBP) to yield:
+where X is the concentration of cells and $\mu$ is the specific growth rate, which in the simplest case is just a rate constant. So the rate of change of the concentration of cells is proportional to the current concentration of cells. In the simplest case, where  we can just solve this by integration by parts (IBP) to yield:
 $$\ln\frac{X}{X_0} = \mu t$$
 or 
 $$X = X_0 e^{\mu t}$$
 
 However, this simple case often deviates from reality, especially as whatever food (substrate) the cells are growing on becomes limited as the cells grow and consume it. To describe this, we expand the specific growth rate to include a dependence on the substrate concentration, $S$. This is called the Monod equation:
 $$\mu = \frac{\mu_{max}S}{K_S+S}$$
-Consider the following variables from the above formula.
-$$\mu_{max}$$  
-$$K_S$$ 
-Here $\mu_{max}$ and $K_S$ are a constants known as the maximum specific growth rate at saturating concentrations of substrate and the equilibrium concentration of substrate, respectively. 
+Consider the following variables from the above formula, 
+$\mu_{max}$ and $K_S$. Here $\mu_{max}$ and $K_S$ are constants known as the maximum specific growth rate at saturating concentrations of substrate and the equilibrium concentration of substrate, respectively. 
 
 Now, we rearrange the equations to obtain a form that is able to be differentiated.
 
@@ -37,15 +37,20 @@ Adding this into the equation above:
 $$\frac{dX}{dt} = \frac{\mu_{max}S}{K_S+S} X$$
 This model fits real data much better; as substrate gets consumed within the culture, the growth rate slows. Unfortunately, we now have 2 parameters to fit and a differential equation to deal with at the same time!
 
+## Calculating derivative values from data
+
 To fit these parameters, we often use numerical differentiation to find $dX/dt$ values from $X$ vs time data. We will also typically measure S vs time as well. This data might look like the below:
 
 ```{r}
-cell_growth <- read_csv("Cell_Growth_Example_Data.csv")
+cell_growth <- read_csv("Data/Cell_Growth_Example_Data.csv")
 knitr::kable(cell_growth)
 ```
+
 In this table, Cell Concentration is $X$ and Glucose Concentration is the substrate concentration $S$. 
 
 Now we can use this data to calculate $dX/dt$ and regress this calculated derivative against $X$ to find $\mu$ and then use a linearization of the Monod equation and an additional regression model to find the parameters $\mu_{max}$ and $K_S$.
+
+### Difference methods
 
 An error-prone way to do this, which basically propagates any error in the data throughout the calculation, would be to just find $\Delta X / \Delta t$ for each pair of points in the dataset. To do this, we can use the `diff` function from base R. `diff` calculates the difference between each value in a vector and the next value.
 
@@ -85,6 +90,8 @@ cell_growth %>%
 ```
 
 The above gives us values, but depending on how noisy the data is the derivative values could be really noisy. This is because in calculating the derivative the noise in two data points is combined, amplifying it.  
+
+### Interpolation methods
 
 The best way to find the derivative of a dataset is to first fit a function to the dataset to smooth the noise of the data. Then find the derivative of that curve. We can use splines for this, and this will work in many general cases, when we don't know the function. Since our data is pretty smooth and sparse (we don't have any overlapping data points) we can adjust the degrees of freedom or `df` parameter of the model to best fit our data. This might require some knowledge of how the data should look to do effectively. For example if we just use the defaults in `splines::bs`:
 
@@ -171,7 +178,7 @@ ggplot(data = cell_growth,
 
 
 
-#INTEGRATION 
+# Integration
 
 ```{r}
 library(dataRetrieval)
@@ -185,37 +192,37 @@ library(lubridate)
 Paper source:
 Rosburg et al. (2016). The effect of flow data resolution on sediment yield estimation and channel design. https://doi.org/10.1016/j.jhydrol.2016.04.040
 
-#Objective: calculate total annual sediment [mass/year] and water [volume/year] for a given year for a specific station
+## Objective: calculate total annual sediment [mass/year] and water [volume/year] for a given year for a specific station
 
-#Approach: 
+## Approach: 
 Here, you'll apply numerical integration using the `trapz` function in `pracma`. You'll want to set up a data frame of x and y, with x = day of year ranging between 1-365; y is the sediment load based on the equation and given streamflow).
 
-#Workflow
+## Workflow
 
 1. Read in sediment-rating curve (data here in the file 1-s2.0-S0022169416302311-mmc2.xlsx)
 2. Read in streamflow data using `readNWISdv` from `dataRetrieval` package
 2. Calculate average daily sediment yield [kg/s]
 3. For a given year, integrate under the daily sediment yield and daily streamflow using `trapz` function within the `pracma` package. 
 
-# Apply case scenario: 
+## Apply case scenario: 
 Compare the 2011 and 2012 year for water and sediment in the Lower Mississippi River (station id 07374000). Create 1 plot (with day of year on x-axis) of streamflow (2 lines, one for 2011 and one for 2012); Create 1 plot (with day of year on x-axis) of sediment flux (2 lines, one for 2011 and one for 2012). Calculate total annual sediment mass and water volume and compare the values between 2011 and 2012. Is the ratio of sediment mass for each year the same as the ratio of water volume (e.g. mass sed 2012/mass sed 2011)? In other words, was the streamflow carrying the same amount of sediment in 2011 and 2012? Create clear graphics and write up your comparison in a paragraph. 
 
 
-### Background on sediment rating curve table and the coefficients $a$ and $b$:
+#### Background on sediment rating curve table and the coefficients $a$ and $b$:
 From Rosburg et al.: Relationships between water discharge and sediment load often can be expressed as a simple power function: 
 $$Q_s = aQ^b$$
 where $Q_s$ is the sediment discharge rate (kg/s), $Q$ is the concurrently-measured water discharge rate (m^3^/s), and $a$ and $b$ are best fit regression parameters (Asselman, 2000, Syvitski et al., 2000). This function is referred to as a sediment rating curve. In this relationship, it has been suggested that the exponent $b$ is related to the transport capacity in excess of sediment supply within a river channel, while the coefficient $a$ is related to absolute sediment supply (Barry et al., 2004). The exponent, $b$, tends to increase with the size of bed material in coarse bed rivers (Emmett and Wolman, 2001).
 
-## Read in sediment rating curve table
+### Read in sediment rating curve table
 ```{r}
-ds <- readxl::read_excel("dataset-1-s2.0-S0022169416302311-mmc2.xlsx", 
+ds <- readxl::read_excel("Data/dataset-1-s2.0-S0022169416302311-mmc2.xlsx", 
      col_types = c("text", "text", "numeric", 
          "numeric", "numeric", "numeric", 
          "numeric", "numeric", "text", 
          "text", "numeric", "numeric", 
          "text"), skip = 1)
 ```
-# Station Identification and Data Retreival
+### Station Identification and Data Retreival
 
 ```{r}
 site_id <- '07374000'
@@ -225,12 +232,12 @@ pCode <- '00060'
 rawDailyQ <- readNWISdv(site_id,pCode, startDate, endDate)
 ```
 
-## Filter sediment table for station of interest
+### Filter sediment table for station of interest
 ```{r}
 dsm <- ds[which(ds$`Site Number`==site_id),]
 ```
 
-## Calculate Daily sediment mass flux
+### Calculate Daily sediment mass flux
 ```{r}
 #cfs
 Q_cms <- rawDailyQ$X_00060_00003/3.28084^3 # conversion to cms
@@ -267,7 +274,7 @@ p3 <- ggplot(d, aes(Date,Qs_kgd)) +
 p3
 ```
 
-# Compare 2011 and 2012 in case study
+## Compare 2011 and 2012 in case study
 
 ```{r}
 

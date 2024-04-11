@@ -1,6 +1,6 @@
 ---
-title: "WW-2 Problem Set"
-author: "Clay Wright"
+title: "12-2 Problem Set"
+author: 
 format: pdf
 ---
 
@@ -22,7 +22,7 @@ Load in data from [dataset-1-s2.0-S0022169416302311-mmc2.xlsx]file & complete th
 # Objective: 
 Calculate total annual sediment [mass/year] and water [volume/year] for a given year for a specific station
 
-#Instructions
+# Instructions
 Repeat the case study workflow from example for the Rappahannock River near Fredericksburg, VA (station ID: 01668000), but this time, instead of just comparing 2 years, find the year with the greatest average sediment flux (`Qs_kgd`) and lowest average sediment flux, for the same range from 2000 through 2020. Create clear graphics and write up your comparison in a paragraph. 
 
 ## Part 1: Streamflow
