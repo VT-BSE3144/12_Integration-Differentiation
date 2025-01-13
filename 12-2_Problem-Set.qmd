@@ -26,7 +26,7 @@ Calculate total annual sediment [mass/year] and water [volume/year] for a given 
 Repeat the case study workflow from example for the Rappahannock River near Fredericksburg, VA (station ID: 01668000), but this time, instead of just comparing 2 years, find the year with the greatest average sediment flux (`Qs_kgd`) and lowest average sediment flux, for the same range from 2000 through 2020. Create clear graphics and write up your comparison in a paragraph. 
 
 ## Part 1: Streamflow
-Create 1 plot (with day of year on x-axis) of streamflow (2 lines, one for highest mean Qs_kgd and one for lowest mean Qs_kgd); 
+Create 1 plot (with day of year on x-axis) of streamflow with 2 lines for two years, the year with the highest mean Qs_kgd and another for the year with the  lowest mean Qs_kgd. 
 
 ## Part 2: Sediment Flux
 Create 1 plot (with day of year on x-axis) of sediment flux (2 lines, one for for highest mean Qs_kgd and one for lowest mean Qs_kgd).

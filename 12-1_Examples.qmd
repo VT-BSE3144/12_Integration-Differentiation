@@ -229,7 +229,10 @@ site_id <- '07374000'
 startDate <- '2000-01-01'
 endDate <- '2020-12-30'
 pCode <- '00060'
-rawDailyQ <- readNWISdv(site_id,pCode, startDate, endDate)
+rawDailyQ <- readNWISdv(siteNumbers = site_id, 
+                        parameterCd = pCode, 
+                        startDate = startDate, 
+                        endDate = endDate)
 ```
 
 ### Filter sediment table for station of interest
