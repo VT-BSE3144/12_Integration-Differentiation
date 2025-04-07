@@ -1,12 +1,10 @@
 ---
-title: "Week 12 - Differentiation & Integration"
-author: "Clay Wright"
-format:
-  html:
-    df_print: paged
-    toc: true
-    toc-depth: 6
+output: html_document
+params:
+  version: 1.0
 ---
+
+# Differentiation & Integration
 
 This week our goals are to be able to:
 
@@ -17,8 +15,6 @@ Differentiation:
 - Explain the process of numerical integration and its significance in science and engineering.
 - Apply numerical integration techniques, such as the trapezoidal rule, to calculate approximate areas under functions or data.
 - Evaluate the limitations and associated error of basic numerical differentiation and integration methods and the advantages of using smoothing techniques, such as splines.
-
-# Week 12 - Differentiation & Integration
 
 Now that we've got some tools from earlier in this semester, we're going to focus on differentiation & integration. Specifically, we will look at examples that apply these calculus methods to real life scenarios. This topic will be particularly useful in future job positions. Being able to automate workflows that can quickly load data and analyze rates & variable relationships has normalized educated & efficient decision-making in the workplace. 
 

@@ -1,16 +1,12 @@
 ---
-title: "12-1 Differentiation and Integration Examples"
-author: "Clay Wright"
-format:
-  html:
-    df_print: paged
-    toc: true
-    toc-depth: 6
+output: html_document
+params:
+  version: 1.0
 ---
 
-Week 12 - Differentiation & Integration
+# Week 12 - Differentiation & Integration
 
-# Differentiation
+## Differentiation
 
 ```{r setup}
 library(readr)
@@ -178,7 +174,7 @@ ggplot(data = cell_growth,
 
 
 
-# Integration
+## Integration
 
 ```{r}
 library(dataRetrieval)
